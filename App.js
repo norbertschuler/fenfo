@@ -1,18 +1,68 @@
 import React, { Component } from 'react';
 import { Alert, AppRegistry, Animated, StyleSheet, Text, TouchableHighlight, View } from 'react-native';
 
-// initialize the game
-const moves = ['green', 'red', 'blue', 'yellow'];
+const colors = ['green', 'red', 'blue', 'yellow'];
+var moves = [];
 
 export default class Senso extends React.Component {
+
     constructor(props) {
         super(props);
-        // this.state = { };
+        this.state = { currentPosition: 0, currentLevel:0 };
+    }
+
+    // initialize the game
+    initGame(level) {
+        // clear the game with nothing or the first step
+        if (level <= 1) {
+            moves = [];
+            for (var i = 0; i < level; i++) {
+                moves[i] = colors[getRandomInt(0, 3)];
+            }
+        // add next step to the game
+        } else {
+            moves[level-1] = colors[getRandomInt(0, 3)];
+        }
+        this.setState( { currentPosition: 0, currentLevel: level } );
+    }
+
+    componentDidMount() {
+        this.initGame(0);
+    }
+
+    // start a new game
+    onPressStartButton() {
+        this.initGame(1);
+        this.animateGame();
     }
 
     // check the buttons pressed by the player
     onPressButton(color) {
-        this.animatedButton(color)
+        // correct button pressed?
+        if (moves[this.state.currentPosition] == color) {
+            // button for last move correctly pressed?
+            if (this.state.currentPosition + 1 === moves.length) {
+                this.initGame( this.state.currentLevel + 1 );
+                this.animateGame();
+            // button within the game correctly pressed?
+            } else {
+                this.setState( { currentPosition: this.state.currentPosition + 1, currentLevel: this.state.currentLevel } );
+            }
+        }
+        else {
+            alert("Leider verloren, probier es noch einmal!");
+            this.initGame(0);
+        }
+        this.animatedButton(color);
+    }
+
+    // show the buttons to remember
+    async animateGame() {
+        await sleep(1000);
+        for (var i = 0; i < moves.length; i++) {
+            this.animatedButton(moves[i]);
+            await sleep(800);
+        }
     }
 
     animatedButton(color) {
@@ -29,14 +79,6 @@ export default class Senso extends React.Component {
         case 'yellow':
             this._yellowButton.highlight();
             break;
-        }
-    }
-
-    // show the buttons to remember
-    async onPressStartButton() {
-        for (var i = 0; i < moves.length; i++) {
-            this.onPressButton(moves[i]);
-            await sleep(800);
         }
     }
 
@@ -64,6 +106,8 @@ export default class Senso extends React.Component {
                 </View>
             </View>
         );
+        // debug with: <Text style={ styles.starttext }>Start ({this.state.currentPosition},{this.state.currentLevel})</Text>
+
     }
 }
 
@@ -127,13 +171,16 @@ const styles = StyleSheet.create({
         width: 120,
         height: 60,
         marginTop: 20,
+        borderWidth: 1,
         borderRadius: 50,
-        backgroundColor: 'white',
+        borderColor: 'white',
+        backgroundColor: 'black',
         justifyContent: 'center',
     },
     starttext: {
         fontWeight: 'bold',
-        fontSize: 30,
+        fontSize: 18,
+        color: 'white',
         textAlign: 'center',
     }
 });
@@ -144,4 +191,8 @@ AppRegistry.registerComponent('senso', () => Senso)
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
