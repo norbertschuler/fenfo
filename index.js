@@ -1,10 +1,24 @@
 import React, { Component } from 'react';
 import { Alert, AppRegistry, Animated, StyleSheet, Text, TouchableHighlight, View } from 'react-native';
+import Sound from 'react-native-sound';
 
 const colors = ['green', 'red', 'blue', 'yellow'];
 var moves = [];
 
-export default class Senso extends React.Component {
+const win = new Sound('win.mp3', Sound.MAIN_BUNDLE, (error) => {
+  if (error) {
+    console.error('failed to load the sound', error);
+    return;
+  }
+});
+const fail = new Sound('fail.mp3', Sound.MAIN_BUNDLE, (error) => {
+  if (error) {
+    console.error('failed to load the sound', error);
+    return;
+  }
+});
+
+export default class Fenfo extends React.Component {
 
     constructor(props) {
         super(props);
@@ -42,6 +56,7 @@ export default class Senso extends React.Component {
         if (moves[this.state.currentPosition] == color) {
             // button for last move correctly pressed?
             if (this.state.currentPosition + 1 === moves.length) {
+                win.setVolume(0.5).play();
                 this.initGame( this.state.currentLevel + 1 );
                 this.animateGame();
             // button within the game correctly pressed?
@@ -50,7 +65,8 @@ export default class Senso extends React.Component {
             }
         }
         else {
-            alert("Leider verloren, probier es noch einmal!");
+            fail.setVolume(1).play();
+            alert("You lost, please try again!");
             this.initGame(0);
         }
         this.animatedButton(color);
@@ -84,8 +100,8 @@ export default class Senso extends React.Component {
 
     render() {
         return (
-            <View>
-                <View style = { styles.container } >
+            <View style = { styles.container }>
+                <View style = { styles.gamebox } >
                     <TouchableHighlight onPress={this.onPressButton.bind(this,'green')} underlayColor="black">
                         <SensoButton ref={component => this._greenButton = component} style={ styles.green } />
                     </TouchableHighlight>
@@ -132,7 +148,7 @@ class SensoButton extends Component {
         let { fadeAnim } = this.state;
         return (
             <Animated.View style={ { opacity: fadeAnim } } >
-                <View style={ [styles.box, this.props.style] } />
+                <View style={ [styles.buttonbox, this.props.style] } />
             </Animated.View>
         );
     }
@@ -140,19 +156,25 @@ class SensoButton extends Component {
 
 const styles = StyleSheet.create({
     container: {
-        paddingTop: 150,
-        paddingBottom: 200,
-        flex: 0,
-        flexDirection: 'row',
-        flexWrap: 'wrap',
+        flex: 1,
         backgroundColor: '#000000',
         justifyContent: 'center',
         alignItems: 'center',
     },
-    box: {
-        width: 120,
-        height: 120,
-        margin: 10,
+    gamebox: {
+        flex: 0,
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        width: 340,
+        height: 410,
+        backgroundColor: '#000000',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    buttonbox: {
+        width: 125,
+        height: 125,
+        margin: 15,
         borderRadius: 50,
     },
     green: {
@@ -185,7 +207,7 @@ const styles = StyleSheet.create({
     }
 });
 
-AppRegistry.registerComponent('senso', () => Senso)
+AppRegistry.registerComponent('fenfo', () => Fenfo)
 
 // helper functions
 
