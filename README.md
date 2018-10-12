@@ -5,7 +5,7 @@ It is a clone of the known Simon (or Senso) game training your memory by remberi
 
 ## About the repository
 
-This repository is using native project for iOS and Android in order to be able to install the game on physical devices with using the the [expo client](https://expo.io/). Open the project either with Android Studio or Xcode and install it on your device.
+This repository is using native projects for iOS and Android in order to be able to install the game on physical devices without using the the [expo client](https://expo.io/). Open the project either with Android Studio or Xcode and install it on your device.
 
 ## Tweaks for running iOS project on real device
 
